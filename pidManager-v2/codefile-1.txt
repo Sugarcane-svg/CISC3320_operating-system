@@ -1,0 +1,101 @@
+//
+//  main.cpp
+//  pidmanager_thread
+//
+//  Created by Phoebe ZOU on 10/5/20.
+//
+
+#include <iostream>
+#include<pthread.h>
+#include <unistd.h>
+
+using namespace std;
+
+int requestpid();
+int allocatepid();
+int allocate_map();
+void releasepid(int index);
+void *threadfunc(void *arg);
+
+const int MIN = 300;  //lower bound
+const int MAX = 5000; //upper bound
+const int numthread = 20;  //total number of threads
+
+int pid[MAX-MIN]; //pid array with fixed capacity
+
+
+
+int main(int argc, const char * argv[]) {
+    
+    //allocation the memory
+    int map = allocate_map();
+    if(map == -1){
+        printf("insufficient locations\n");
+    }else{
+        pthread_t thread[numthread];
+        srand((unsigned int)time(NULL));
+        for(int i = 0; i<numthread; i++){
+            if(pthread_create(&thread[i],NULL,threadfunc,(void*)&i)){
+                printf("cannot create thread in %d position\n", i);
+            }
+        }
+        
+        for(int i = 0; i<numthread; i++){
+            pthread_join(thread[i],NULL);  //finish until all subprocesses are done
+        }
+    }
+    
+
+    return 0;
+}
+
+
+
+void *threadfunc(void *arg){
+    int tid = *(( int* )arg);
+    
+    int pid = allocatepid();
+    if(pid == -1){
+        cout<<"pid is not located"<<endl;
+    }else{
+        printf("Thread: %d creates pid: %d in position %d.\n",tid, pid, pid-MIN);
+        int time = rand()%6;
+        sleep(time); //sleep for 0-6 sec
+        releasepid(pid-MIN);
+        printf("Thread: %d releases pid: %d in position %d.\n",tid, pid, pid-MIN);
+    }
+    
+    pthread_exit(NULL);
+    
+}
+
+//request an actual pid number
+int requestpid(){
+    return getpid();
+}
+
+//assign a piece of location
+int allocate_map(){
+    int size = MAX-MIN;
+    for(int i = 0; i<size; i++){
+        pid[i]=0;
+        if(i==size - 1) return 1; //until the whole array is free
+    }
+    return -1;
+}
+//present the state of pid
+int allocatepid(){
+    int size = MAX-MIN;
+    for(int i = 0; i<size; i++){
+        if(pid[i]==0){
+            pid[i]=requestpid();  //actual pid value
+            return i+MIN;  //pseudo pid value
+        }
+    }
+    return -1;
+}
+
+//release pid number from provided index
+void releasepid(int index){
+    pid[index]=0;
+}

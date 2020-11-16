@@ -1,0 +1,16 @@
+Assignment design: 
+
+1. requestpid(): get the actual pid number from system (more for practice purpose)
+
+2. int allocate_pid(): assign pid into selected location
+ use -1 to indicate the failure of assigning pid, otherwise just simply return the value of pseudo-pid.
+
+3. int allocate_map(): get the memory location
+ use -1 and 1 to indicate the succeed and failure of location creation. 
+
+4. void release_pid():
+ use to delete or reset the memory location to make availability.
+
+5. void *threadfunc(void *arg): create threads to request pseudo-pid, wait for a while then release the pid
+
+6. Proper output is needed.
