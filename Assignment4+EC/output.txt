@@ -1,0 +1,14 @@
+head: 1807
+using FCFS: 
+	the total moves = 13446
+using SSTF: 
+	the total moves = 3975
+using SCAN: 
+	the total moves = 6474
+using C-SCAN: 
+	the total moves = 11584
+using LOOK: 
+	the total moves = 6328
+using C-LOOK: 
+	the total moves = 10684
+Program ended with exit code: 0
